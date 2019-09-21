@@ -1,0 +1,55 @@
+/*
+This file is part of BCDiscord for Browser.
+
+BCDiscord for Browser is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+BCDiscord for Browser is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+// config.jsの実例、CONFIGのプロパティとして設定を定義してください。
+const CONFIG = {
+  // jQuery UIのTheme名、'base', 'black-tie', 'blitzer', 'dot-luv', 'eggplant', 'pepper-grinder', 'trontastic', 'vader'等（デフォルト'smoothness'）
+  theme: 'excite-bike',
+  // BCDice-API サーバのURL
+  api_url: 'https://nana-bcdice-api.herokuapp.com/',
+  // URL入力欄をロックするか（デフォルトfalse、api_urlでURLが指定されている場合のみ有効）
+  lock_url_input: true,
+  // データ保存にローカルストレージを使用するか（デフォルトtrue）、使用しない場合、ブラウザを閉じると設定したデータが消える
+  //use_local_storage: false,
+  // Botに「～をプレイ中」を表示するか、複数チャンネルで違うシステムをプレイしている場合ダイスを振るたびに表示が変わります（デフォルトfalse）
+  show_game_name: true,
+  // ダイスロール結果を@mentionとして表示する（デフォルトtrue）
+  result_at_mention: false,
+  // 複数回ロールの最大数(デフォルト10回、0で複数回ロール不許可、nullで回数制限なし)
+  multiple_max: 8,
+  // コマンドを'bcdice'から変更
+  //command_string: 'bcd',
+  // ブラウザからのJSONデータの取得にjsonpを使用する（デフォルトfalse）、利用するBCDice-APIのバージョンが0.6未満の場合はtrueにする必要あり（非推奨）
+  //use_jsonp: true,
+  // ダイスコマンドの全角半角変換後、APIに送る前に行う処理を定義できる
+  pre_process: function(command, infos) {
+    // gameTypeがエースキラージーン等の場合、ダイスのデフォルトをD10にする
+    if (/(AceKillerGene|BladeOfArcana|CodeLayerd|DoubleCross|GardenOrder)/i.test(infos.gameType)) {
+      command = command.replace(/(^|\b|S)(\d+D)(D|K|[^\d\w]|$)/gi, "$1$210$3");
+    }
+    return command;
+  },
+  // APIからの結果を表示する前に行う処理を定義できる
+  post_process: function(result, infos) {
+    // コメントに「命中判定」「攻撃」「Attack」を含む場合、結果の「成功」を「命中！」に置き換える
+    if (/(命中判定|攻撃|Attack)/i.test(infos.comment)) {
+      result = result.replace(/成功/, '命中！');
+    }
+    // どどんとふ風
+    return result.replace(/＞/g, '→');
+  },
+};
